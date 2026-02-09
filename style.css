@@ -1,0 +1,342 @@
+/* Root variables for easy theming - Light Mode */
+:root {
+  --gn-bg-color: rgba(255, 255, 255, 0.95);
+  --gn-text-color: #333333;
+  --gn-accent-color: #ff80ab; /* Pink accent */
+  --gn-hover-color: rgba(0, 0, 0, 0.05);
+  --gn-border-radius: 16px;
+  --gn-spacing: 12px;
+  --gn-sidebar-width: 280px;
+  --gn-transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* --- Sidebar --- */
+#gemini-nav-sidebar {
+  position: fixed;
+  top: 80px; 
+  left: auto; 
+  right: 20px; 
+  width: var(--gn-sidebar-width);
+  max-height: 80vh; 
+  height: auto;     
+  background-color: var(--gn-bg-color);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--gn-border-radius);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15); /* Softer shadow */
+  z-index: 2147483647; 
+  display: flex;
+  flex-direction: column;
+  padding: var(--gn-spacing);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none; 
+  border: 1px solid rgba(0, 0, 0, 0.08); /* Light border */
+  font-family: 'Google Sans', Roboto, sans-serif;
+  font-size: 14px;
+  color: var(--gn-text-color);
+}
+
+#gemini-nav-sidebar.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Sidebar Header / Search - Removed */
+/* .gn-header { ... } */
+
+/* TOC List */
+#gn-toc-list {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 4px; 
+  max-height: 300px; /* Increased slightly */
+}
+
+/* Scrollbar styling - Light Mode */
+#gn-toc-list::-webkit-scrollbar {
+  width: 6px;
+}
+#gn-toc-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+#gn-toc-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.gn-toc-item {
+  padding: 10px 12px;
+  margin-bottom: 4px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: all 0.2s ease;
+  opacity: 0.9;
+  font-weight: 500;
+  color: #5f6368;
+}
+
+.gn-toc-item:hover {
+  background: var(--gn-hover-color);
+  color: #202124;
+  opacity: 1;
+}
+
+.gn-toc-item.active {
+  background: rgba(255, 128, 171, 0.15); /* Pink tint */
+  color: #d81b60; /* Darker pink for text */
+  font-weight: 600;
+  border-left: none; 
+  opacity: 1;
+}
+
+.gn-toc-item.active-view {
+  /* Style for item currently in view (scrolled to) */
+  background: var(--gn-accent-color); 
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(255, 128, 171, 0.4);
+}
+
+.gn-toc-item .gn-index {
+  font-size: 0.85em;
+  opacity: 0.5;
+  margin-right: 8px;
+  font-weight: 400;
+}
+
+/* --- Floating Toggle Button --- */
+#gn-toggle-btn {
+  position: fixed;
+  top: 100px; 
+  right: 0; /* Default docked right */
+  width: 40px; 
+  height: 40px;
+  border-radius: 8px 0 0 8px; /* Restored to more square-like with rounded corners */
+  background: white;
+  color: var(--gn-accent-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  z-index: 2147483647;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: none;
+  opacity: 1; 
+  font-size: 20px;
+}
+
+#gn-toggle-btn.dock-left {
+    left: 0;
+    right: auto;
+    border-radius: 0 8px 8px 0; /* Restored */
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-left: none;
+    box-shadow: 4px 0 12px rgba(0,0,0,0.15);
+}
+
+#gn-toggle-btn:hover {
+  background: #fff0f5; /* Light pink hover */
+  /* width: 48px;  REMOVED EXPANSION */
+}
+
+#gn-toggle-btn:active {
+  cursor: grabbing;
+  background: #fce4ec;
+}
+
+/* Ensure it stays visible if sidebar is open (optional, depending on preference) */
+.gn-sidebar-open #gn-toggle-btn {
+    opacity: 1;
+    right: var(--gn-sidebar-width); /* Move with sidebar if needed, or keep at edge */
+}
+
+/* --- Quick Actions (Bottom Right) --- */
+#gn-quick-actions {
+  position: fixed;
+  bottom: 24px;
+  right: 0; /* Docked to right edge */
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Remove gap for seamless look */
+  z-index: 2147483646; 
+  background: white;
+  padding: 8px 4px 8px 2px; /* Slight padding */
+  border-radius: 12px 0 0 12px; /* Left-side rounded only */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-right: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.gn-action-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px; /* Soft squares */
+  background: transparent; 
+  color: #5f6368;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+  opacity: 0.8;
+  margin: 2px 0;
+}
+
+.gn-action-btn:hover {
+  background: #f1f3f4;
+  color: var(--gn-accent-color);
+  opacity: 1;
+}
+
+.gn-action-btn:active {
+  background: #e8eaed;
+  transform: scale(0.95);
+}
+
+.gn-divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 4px 6px;
+}
+
+/* --- Pin Button (Injected into Chat) --- */
+.gn-pin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  opacity: 0; /* Hidden by default */
+  transition: opacity 0.2s, transform 0.2s;
+  color: var(--gn-text-color);
+  font-size: 14px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  
+  /* Absolute positioning */
+  position: absolute;
+  bottom: 0px;
+  right: -30px; /* Outside to the right */
+  z-index: 10;
+}
+
+*:hover > .gn-pin-btn {
+  opacity: 0.6;
+}
+
+.gn-pin-btn:hover, .gn-pin-btn.pinned {
+  opacity: 1 !important;
+  color: var(--gn-accent-color);
+  transform: scale(1.1);
+}
+
+/* --- Settings Modal --- */
+#gn-settings-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #1e1e1e;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 2147483648;
+    width: 300px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: none;
+    color: #e3e3e3;
+    font-family: 'Google Sans', Roboto, sans-serif;
+}
+
+#gn-settings-modal.visible {
+    display: block;
+}
+
+#gn-settings-modal h2 {
+    margin-top: 0;
+    font-size: 18px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 10px;
+}
+
+#gn-settings-modal .form-group {
+    margin-bottom: 15px;
+}
+
+#gn-settings-modal label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 13px;
+    opacity: 0.8;
+}
+
+#gn-settings-modal input[type="number"], 
+#gn-settings-modal input[type="color"] {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+    padding: 6px;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+#gn-settings-modal .btn-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+#gn-settings-modal button {
+    padding: 8px 16px;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+#gn-settings-modal .btn-save {
+    background: var(--gn-accent-color);
+    color: white;
+}
+
+#gn-settings-modal .btn-cancel {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+#gn-settings-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2147483647;
+    display: none;
+}
+
+#gn-settings-modal-overlay.visible {
+    display: block;
+}
+
+/* --- Pinned Section in Sidebar --- */
+.gn-pinned-section {
+  margin-top: var(--gn-spacing);
+  padding-top: var(--gn-spacing);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.gn-section-title {
+  font-size: 0.85em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  margin-bottom: 8px;
+}

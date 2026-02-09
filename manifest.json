@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Gemini Context Navigator",
+  "version": "1.0",
+  "description": "Navigate long Gemini conversations with auto-generated TOC and quick jumps.",
+  "icons": {
+    "16": "icon128.png",
+    "48": "icon128.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_icon": "icon128.png",
+    "default_title": "Gemini Context Navigator"
+  },
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://gemini.google.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "style.css"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
