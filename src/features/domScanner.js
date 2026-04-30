@@ -1,0 +1,86 @@
+class GeminiNavigatorScanner {
+  constructor(config) {
+    this.config = config;
+    this.lastHash = '';
+  }
+
+  findUserMessageElements() {
+    let elements = document.querySelectorAll(this.config.selectors.userMessage);
+
+    if (elements.length === 0) {
+      const allDivs = document.querySelectorAll('div');
+      const userQueryDivs = Array.from(allDivs).filter((div) =>
+        div.className.includes && div.className.includes('user-query')
+      );
+
+      if (userQueryDivs.length > 0) {
+        elements = userQueryDivs;
+      }
+    }
+
+    if (elements.length === 0) {
+      const imgs = document.querySelectorAll('img[src*="googleusercontent"]');
+      const potentialMessages = [];
+
+      imgs.forEach((img) => {
+        let parent = img.parentElement;
+
+        for (let i = 0; i < 5; i += 1) {
+          if (!parent) break;
+
+          if (parent.innerText && parent.innerText.length > 5) {
+            potentialMessages.push(parent);
+            break;
+          }
+
+          parent = parent.parentElement;
+        }
+      });
+
+      if (potentialMessages.length > 0) {
+        elements = potentialMessages;
+      }
+    }
+
+    return elements;
+  }
+
+  hasChanged(elements, existingMessageCount) {
+    const newHash = `${elements.length}:${
+      elements.length > 0 ? elements[elements.length - 1].innerText.length : 0
+    }`;
+
+    if (this.lastHash === newHash && existingMessageCount > 0) {
+      return false;
+    }
+
+    this.lastHash = newHash;
+    return true;
+  }
+
+  buildMessages(elements, settings) {
+    let candidates = elements;
+    const limit = parseInt(settings.tocLimit, 10) || 0;
+
+    if (limit > 0 && candidates.length > limit) {
+      candidates = Array.from(candidates).slice(candidates.length - limit);
+    }
+
+    return Array.from(candidates).reduce((messages, el, index) => {
+      const text = el.innerText.trim();
+      if (!text) return messages;
+
+      const title =
+        text.slice(0, this.config.tocLength) +
+        (text.length > this.config.tocLength ? '...' : '');
+
+      messages.push({
+        element: el,
+        title,
+        index
+      });
+
+      return messages;
+    }, []);
+  }
+}
