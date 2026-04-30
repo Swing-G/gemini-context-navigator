@@ -23,13 +23,13 @@
         "https://gemini.google.com/*"
       ],
       "js": [
-        "config.js",
-        "utils.js",
-        "storage.js",
-        "domScanner.js",
-        "scroll.js",
-        "ui.js",
-        "content.js"
+        "src/config/config.js",
+        "src/utils/utils.js",
+        "src/services/storage.js",
+        "src/features/domScanner.js",
+        "src/features/scroll.js",
+        "src/ui/ui.js",
+        "src/content.js"
       ],
       "css": [
         "style.css"
