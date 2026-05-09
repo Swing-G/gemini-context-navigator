@@ -8,6 +8,7 @@ class GeminiNavigatorUI {
     this.pinnedList = null;
     this.pinnedItems = null;
     this.isSidebarOpen = false;
+    this.activeIndex = -1;
     this.pinnedMessages = new Set();
   }
 
@@ -67,6 +68,7 @@ class GeminiNavigatorUI {
       clearTimeout(hoverTimeout);
       this.isSidebarOpen = true;
       this.sidebar.classList.add('visible');
+      this.scrollActiveItemIntoView();
       toggleBtn.innerHTML = '×';
       toggleBtn.style.opacity = '1';
 
@@ -203,6 +205,7 @@ class GeminiNavigatorUI {
 
   renderMessages(messages) {
     this.tocList.innerHTML = '';
+    this.activeIndex = -1;
 
     if (messages.length === 0) {
       this.tocList.innerHTML = '<div style="padding:10px; opacity:0.6;">No messages found. <br><small>Try refreshing or scrolling.</small></div>';
@@ -222,7 +225,7 @@ class GeminiNavigatorUI {
       item.appendChild(document.createTextNode(` ${message.title}`));
       item.onclick = () => {
         this.scroll.scrollToElement(message.element);
-        this.highlightActive(index);
+        this.highlightActive(index, { scrollIntoView: true });
       };
 
       this.tocList.appendChild(item);
@@ -287,12 +290,36 @@ class GeminiNavigatorUI {
     });
   }
 
-  highlightActive(index) {
+  highlightActive(index, options = {}) {
+    if (index < 0 || this.activeIndex === index) {
+      if (options.scrollIntoView) {
+        this.scrollActiveItemIntoView();
+      }
+      return;
+    }
+
     const items = this.tocList.querySelectorAll('.gn-toc-item');
     items.forEach((item) => item.classList.remove('active'));
 
     if (items[index]) {
       items[index].classList.add('active');
+      this.activeIndex = index;
+
+      if (options.scrollIntoView) {
+        this.scrollActiveItemIntoView();
+      }
+    }
+  }
+
+  scrollActiveItemIntoView() {
+    if (!this.isSidebarOpen || this.activeIndex < 0) return;
+
+    const activeItem = this.tocList.querySelector(
+      `.gn-toc-item[data-index="${this.activeIndex}"]`
+    );
+
+    if (activeItem) {
+      activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   }
 

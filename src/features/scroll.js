@@ -28,23 +28,41 @@ class GeminiNavigatorScroll {
   }
 
   findCurrentMessageIndex(messages) {
-    let currentIndex = -1;
+    if (!messages.length) return -1;
 
-    for (let i = 0; i < messages.length; i += 1) {
+    const viewportCenter = window.innerHeight / 2;
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    messages.forEach((message, index) => {
+      const rect = message.element.getBoundingClientRect();
+
+      if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        return;
+      }
+
+      const messageCenter = rect.top + rect.height / 2;
+      const distance = Math.abs(messageCenter - viewportCenter);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    if (closestDistance !== Number.POSITIVE_INFINITY) {
+      return closestIndex;
+    }
+
+    for (let i = messages.length - 1; i >= 0; i -= 1) {
       const rect = messages[i].element.getBoundingClientRect();
-      const absoluteTop = rect.top + window.scrollY;
 
-      if (absoluteTop >= window.scrollY) {
-        currentIndex = i;
-        break;
+      if (rect.top <= viewportCenter) {
+        return i;
       }
     }
 
-    if (currentIndex === -1) {
-      currentIndex = messages.length - 1;
-    }
-
-    return currentIndex;
+    return 0;
   }
 
   navigate(messages, direction) {
