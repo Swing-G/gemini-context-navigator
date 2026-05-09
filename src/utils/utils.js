@@ -30,6 +30,18 @@ const GeminiNavigatorUtils = {
     return hash.toString(36);
   },
 
+  stripTitlePrefix(text, prefixes) {
+    if (!prefixes) return text;
+
+    for (const prefix of prefixes) {
+      if (text.startsWith(prefix)) {
+        return text.slice(prefix.length).trim();
+      }
+    }
+
+    return text;
+  },
+
   hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);

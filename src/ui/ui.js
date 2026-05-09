@@ -298,7 +298,10 @@ class GeminiNavigatorUI {
 
       this.pinnedList.style.display = 'block';
       this.pinnedMessages.forEach((el) => {
-        const text = `${el.innerText.slice(0, 20)}...`;
+        let rawText = el.innerText.trim();
+        rawText = GeminiNavigatorUtils.stripTitlePrefix(rawText, GeminiNavigatorConfig.titlePrefixes);
+        const text = rawText.slice(0, GeminiNavigatorConfig.tocLength) +
+          (rawText.length > GeminiNavigatorConfig.tocLength ? '...' : '');
         const item = document.createElement('div');
         item.className = 'gn-toc-item';
         item.textContent = `📌 ${text}`;
