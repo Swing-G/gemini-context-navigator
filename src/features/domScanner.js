@@ -46,9 +46,12 @@ class GeminiNavigatorScanner {
   }
 
   hasChanged(elements, existingMessageCount) {
-    const newHash = `${elements.length}:${
-      elements.length > 0 ? elements[elements.length - 1].innerText.length : 0
-    }`;
+    const snippetLen = 30;
+    const fingerprint = Array.from(elements)
+      .map((el) => el.innerText.slice(0, snippetLen))
+      .join('|');
+
+    const newHash = `${elements.length}:${GeminiNavigatorUtils.simpleHash(fingerprint)}`;
 
     if (this.lastHash === newHash && existingMessageCount > 0) {
       return false;
