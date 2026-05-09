@@ -10,6 +10,8 @@ class GeminiNavigatorUI {
     this.isSidebarOpen = false;
     this.activeIndex = -1;
     this.pinnedMessages = new Set();
+    this.isUserBrowsingTOC = false;
+    this.browsingTimeout = null;
   }
 
   create() {
@@ -56,6 +58,26 @@ class GeminiNavigatorUI {
     this.tocList = this.sidebar.querySelector('#gn-toc-list');
     this.pinnedList = this.sidebar.querySelector('#gn-pinned-list');
     this.pinnedItems = this.sidebar.querySelector('#gn-pinned-items');
+
+    this.tocList.addEventListener('mouseenter', () => {
+      this.isUserBrowsingTOC = true;
+      clearTimeout(this.browsingTimeout);
+    });
+
+    this.tocList.addEventListener('mouseleave', () => {
+      clearTimeout(this.browsingTimeout);
+      this.browsingTimeout = setTimeout(() => {
+        this.isUserBrowsingTOC = false;
+      }, 1500);
+    });
+
+    this.tocList.addEventListener('wheel', () => {
+      this.isUserBrowsingTOC = true;
+      clearTimeout(this.browsingTimeout);
+      this.browsingTimeout = setTimeout(() => {
+        this.isUserBrowsingTOC = false;
+      }, 2000);
+    }, { passive: true });
   }
 
   createToggleButton() {
@@ -339,7 +361,7 @@ class GeminiNavigatorUI {
   }
 
   scrollActiveItemIntoView() {
-    if (!this.isSidebarOpen || this.activeIndex < 0) return;
+    if (!this.isSidebarOpen || this.activeIndex < 0 || this.isUserBrowsingTOC) return;
 
     try {
       const activeItem = this.tocList.querySelector(
