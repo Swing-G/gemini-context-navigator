@@ -71,6 +71,18 @@ class GeminiNavigatorScanner {
     }
   }
 
+  stripTitlePrefix(text) {
+    const prefixes = this.config.titlePrefixes || [];
+
+    for (const prefix of prefixes) {
+      if (text.startsWith(prefix)) {
+        return text.slice(prefix.length).trim();
+      }
+    }
+
+    return text;
+  }
+
   buildMessages(elements, settings) {
     try {
       let candidates = elements;
@@ -81,8 +93,10 @@ class GeminiNavigatorScanner {
       }
 
       return Array.from(candidates).reduce((messages, el, index) => {
-        const text = el.innerText.trim();
+        let text = el.innerText.trim();
         if (!text) return messages;
+
+        text = this.stripTitlePrefix(text);
 
         const title =
           text.slice(0, this.config.tocLength) +

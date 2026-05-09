@@ -7,6 +7,7 @@ const GeminiNavigatorConfig = {
     messageBlock: '.message-content, .conversation-turn'
   },
   tocLength: 50,
+  titlePrefixes: ['You said', 'You said\n', '你说', '你说\n'],
   defaultSettings: {
     tocLimit: 50,
     accentColor: '#ff80ab',
