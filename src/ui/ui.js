@@ -13,23 +13,31 @@ class GeminiNavigatorUI {
   }
 
   create() {
-    this.createSidebar();
-    this.createToggleButton();
-    this.createQuickActions();
+    try {
+      this.createSidebar();
+      this.createToggleButton();
+      this.createQuickActions();
+    } catch (error) {
+      console.error('Gemini Context Navigator: Error creating UI', error);
+    }
   }
 
   applySettings(settings) {
-    const root = document.documentElement;
+    try {
+      const root = document.documentElement;
 
-    if (settings.accentColor) {
-      root.style.setProperty('--gn-accent-color', settings.accentColor);
-    }
+      if (settings.accentColor) {
+        root.style.setProperty('--gn-accent-color', settings.accentColor);
+      }
 
-    if (settings.bgColor) {
-      root.style.setProperty(
-        '--gn-bg-color',
-        GeminiNavigatorUtils.hexToRgba(settings.bgColor, 0.85)
-      );
+      if (settings.bgColor) {
+        root.style.setProperty(
+          '--gn-bg-color',
+          GeminiNavigatorUtils.hexToRgba(settings.bgColor, 0.85)
+        );
+      }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error applying settings', error);
     }
   }
 
@@ -204,52 +212,60 @@ class GeminiNavigatorUI {
   }
 
   renderMessages(messages) {
-    this.tocList.innerHTML = '';
-    this.activeIndex = -1;
+    try {
+      this.tocList.innerHTML = '';
+      this.activeIndex = -1;
 
-    if (messages.length === 0) {
-      this.tocList.innerHTML = '<div style="padding:10px; opacity:0.6;">No messages found. <br><small>Try refreshing or scrolling.</small></div>';
-      return;
+      if (messages.length === 0) {
+        this.tocList.innerHTML = '<div style="padding:10px; opacity:0.6;">No messages found. <br><small>Try refreshing or scrolling.</small></div>';
+        return;
+      }
+
+      messages.forEach((message, index) => {
+        const item = document.createElement('div');
+        item.className = 'gn-toc-item';
+        item.dataset.index = index;
+
+        const indexEl = document.createElement('span');
+        indexEl.className = 'gn-index';
+        indexEl.textContent = `#${index + 1}`;
+
+        item.appendChild(indexEl);
+        item.appendChild(document.createTextNode(` ${message.title}`));
+        item.onclick = () => {
+          this.scroll.scrollToElement(message.element);
+          this.highlightActive(index, { scrollIntoView: true });
+        };
+
+        this.tocList.appendChild(item);
+        this.injectPinButton(message.element, message.title);
+      });
+    } catch (error) {
+      console.error('Gemini Context Navigator: Error rendering messages', error);
     }
-
-    messages.forEach((message, index) => {
-      const item = document.createElement('div');
-      item.className = 'gn-toc-item';
-      item.dataset.index = index;
-
-      const indexEl = document.createElement('span');
-      indexEl.className = 'gn-index';
-      indexEl.textContent = `#${index + 1}`;
-
-      item.appendChild(indexEl);
-      item.appendChild(document.createTextNode(` ${message.title}`));
-      item.onclick = () => {
-        this.scroll.scrollToElement(message.element);
-        this.highlightActive(index, { scrollIntoView: true });
-      };
-
-      this.tocList.appendChild(item);
-      this.injectPinButton(message.element, message.title);
-    });
   }
 
   injectPinButton(el, title) {
-    if (el.querySelector('.gn-pin-btn')) return;
+    try {
+      if (el.querySelector('.gn-pin-btn')) return;
 
-    if (getComputedStyle(el).position === 'static') {
-      el.style.position = 'relative';
+      if (getComputedStyle(el).position === 'static') {
+        el.style.position = 'relative';
+      }
+
+      const btn = document.createElement('span');
+      btn.className = 'gn-pin-btn';
+      btn.innerHTML = '📌';
+      btn.title = 'Pin this message';
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        this.togglePin(el, title, btn);
+      };
+
+      el.appendChild(btn);
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error injecting pin button', error);
     }
-
-    const btn = document.createElement('span');
-    btn.className = 'gn-pin-btn';
-    btn.innerHTML = '📌';
-    btn.title = 'Pin this message';
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      this.togglePin(el, title, btn);
-    };
-
-    el.appendChild(btn);
   }
 
   togglePin(el, title, btn) {
@@ -272,65 +288,81 @@ class GeminiNavigatorUI {
   }
 
   renderPinnedItems() {
-    this.pinnedItems.innerHTML = '';
+    try {
+      this.pinnedItems.innerHTML = '';
 
-    if (this.pinnedMessages.size === 0) {
-      this.pinnedList.style.display = 'none';
-      return;
+      if (this.pinnedMessages.size === 0) {
+        this.pinnedList.style.display = 'none';
+        return;
+      }
+
+      this.pinnedList.style.display = 'block';
+      this.pinnedMessages.forEach((el) => {
+        const text = `${el.innerText.slice(0, 20)}...`;
+        const item = document.createElement('div');
+        item.className = 'gn-toc-item';
+        item.textContent = `📌 ${text}`;
+        item.onclick = () => this.scroll.scrollToElement(el);
+        this.pinnedItems.appendChild(item);
+      });
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error rendering pinned items', error);
     }
-
-    this.pinnedList.style.display = 'block';
-    this.pinnedMessages.forEach((el) => {
-      const text = `${el.innerText.slice(0, 20)}...`;
-      const item = document.createElement('div');
-      item.className = 'gn-toc-item';
-      item.textContent = `📌 ${text}`;
-      item.onclick = () => this.scroll.scrollToElement(el);
-      this.pinnedItems.appendChild(item);
-    });
   }
 
   highlightActive(index, options = {}) {
-    if (index < 0 || this.activeIndex === index) {
-      if (options.scrollIntoView) {
-        this.scrollActiveItemIntoView();
+    try {
+      if (index < 0 || this.activeIndex === index) {
+        if (options.scrollIntoView) {
+          this.scrollActiveItemIntoView();
+        }
+        return;
       }
-      return;
-    }
 
-    const items = this.tocList.querySelectorAll('.gn-toc-item');
-    items.forEach((item) => item.classList.remove('active'));
+      const items = this.tocList.querySelectorAll('.gn-toc-item');
+      items.forEach((item) => item.classList.remove('active'));
 
-    if (items[index]) {
-      items[index].classList.add('active');
-      this.activeIndex = index;
+      if (items[index]) {
+        items[index].classList.add('active');
+        this.activeIndex = index;
 
-      if (options.scrollIntoView) {
-        this.scrollActiveItemIntoView();
+        if (options.scrollIntoView) {
+          this.scrollActiveItemIntoView();
+        }
       }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error highlighting active item', error);
     }
   }
 
   scrollActiveItemIntoView() {
     if (!this.isSidebarOpen || this.activeIndex < 0) return;
 
-    const activeItem = this.tocList.querySelector(
-      `.gn-toc-item[data-index="${this.activeIndex}"]`
-    );
+    try {
+      const activeItem = this.tocList.querySelector(
+        `.gn-toc-item[data-index="${this.activeIndex}"]`
+      );
 
-    if (activeItem) {
-      activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (activeItem) {
+        activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error scrolling active item into view', error);
     }
   }
 
   filterTOC(query) {
-    const items = this.tocList.querySelectorAll('.gn-toc-item');
-    const normalizedQuery = query.toLowerCase();
+    try {
+      const items = this.tocList.querySelectorAll('.gn-toc-item');
+      const normalizedQuery = query.toLowerCase();
 
-    items.forEach((item) => {
-      item.style.display = item.innerText.toLowerCase().includes(normalizedQuery)
-        ? 'block'
-        : 'none';
-    });
+      items.forEach((item) => {
+        item.style.display = item.innerText.toLowerCase().includes(normalizedQuery)
+          ? 'block'
+          : 'none';
+      });
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error filtering TOC', error);
+    }
   }
 }

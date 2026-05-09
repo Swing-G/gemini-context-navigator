@@ -23,25 +23,33 @@ class GeminiNavigator {
     this.observedTarget = null;
 
     this.storage.loadSettings().then((settings) => {
-      this.settings = settings;
-      this.ui.create();
-      this.ui.applySettings(this.settings);
-      this.setupObserver();
-      this.setupUrlWatcher();
-      this.setupScrollSpy();
+      try {
+        this.settings = settings;
+        this.ui.create();
+        this.ui.applySettings(this.settings);
+        this.setupObserver();
+        this.setupUrlWatcher();
+        this.setupScrollSpy();
 
-      setTimeout(() => this.scanMessages(), 2000);
+        setTimeout(() => this.scanMessages(), 2000);
+      } catch (error) {
+        console.error('Gemini Context Navigator: Failed to initialize', error);
+      }
     });
   }
 
   findConversationContainer() {
-    const selectors = this.config.selectors.conversationContainer.split(',');
+    try {
+      const selectors = this.config.selectors.conversationContainer.split(',');
 
-    for (const selector of selectors) {
-      const el = document.querySelector(selector.trim());
-      if (el && el.children.length > 0) {
-        return el;
+      for (const selector of selectors) {
+        const el = document.querySelector(selector.trim());
+        if (el && el.children.length > 0) {
+          return el;
+        }
       }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error finding conversation container', error);
     }
 
     return null;
@@ -124,17 +132,25 @@ class GeminiNavigator {
   reattachObserver() {
     if (!this.observer) return;
 
-    this.observer.disconnect();
+    try {
+      this.observer.disconnect();
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error disconnecting observer', error);
+    }
 
     setTimeout(() => {
-      const container = this.findConversationContainer();
-      if (container) {
-        this.observedTarget = container;
-        this.observer.observe(container, { childList: true, subtree: true });
-      } else {
-        this.observedTarget = document.body;
-        this.observer.observe(document.body, { childList: true, subtree: true });
-        this.scheduleContainerRetry();
+      try {
+        const container = this.findConversationContainer();
+        if (container) {
+          this.observedTarget = container;
+          this.observer.observe(container, { childList: true, subtree: true });
+        } else {
+          this.observedTarget = document.body;
+          this.observer.observe(document.body, { childList: true, subtree: true });
+          this.scheduleContainerRetry();
+        }
+      } catch (error) {
+        console.error('Gemini Context Navigator: Error reattaching observer', error);
       }
     }, 500);
   }
@@ -153,27 +169,39 @@ class GeminiNavigator {
   }
 
   syncActiveMessage() {
-    const activeIndex = this.scroll.findCurrentMessageIndex(this.messages);
-    this.ui.highlightActive(activeIndex, { scrollIntoView: this.ui.isSidebarOpen });
+    try {
+      const activeIndex = this.scroll.findCurrentMessageIndex(this.messages);
+      this.ui.highlightActive(activeIndex, { scrollIntoView: this.ui.isSidebarOpen });
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error syncing active message', error);
+    }
   }
 
   scanMessages() {
-    const elements = this.scanner.findUserMessageElements();
+    try {
+      const elements = this.scanner.findUserMessageElements();
 
-    if (!this.scanner.hasChanged(elements, this.messages.length)) {
-      return;
+      if (!this.scanner.hasChanged(elements, this.messages.length)) {
+        return;
+      }
+
+      this.messages = this.scanner.buildMessages(elements, this.settings);
+      this.ui.renderMessages(this.messages);
+      this.syncActiveMessage();
+    } catch (error) {
+      console.error('Gemini Context Navigator: Error scanning messages', error);
     }
-
-    this.messages = this.scanner.buildMessages(elements, this.settings);
-    this.ui.renderMessages(this.messages);
-    this.syncActiveMessage();
   }
 
   navigate(direction) {
-    const targetIndex = this.scroll.navigate(this.messages, direction);
+    try {
+      const targetIndex = this.scroll.navigate(this.messages, direction);
 
-    if (targetIndex !== null) {
-      this.ui.highlightActive(targetIndex);
+      if (targetIndex !== null) {
+        this.ui.highlightActive(targetIndex);
+      }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error navigating', error);
     }
   }
 }

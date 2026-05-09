@@ -1,13 +1,21 @@
 class GeminiNavigatorScroll {
   scrollToElement(element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    try {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error scrolling to element', error);
+    }
   }
 
   scrollAll(top) {
-    window.scrollTo({
-      top: top ? 0 : document.body.scrollHeight,
-      behavior: 'smooth'
-    });
+    try {
+      window.scrollTo({
+        top: top ? 0 : document.body.scrollHeight,
+        behavior: 'smooth'
+      });
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error scrolling window', error);
+    }
 
     const candidates = document.querySelectorAll(
       'main, infinite-scroller, .scroll-container, [class*="scroll"]'
@@ -30,36 +38,40 @@ class GeminiNavigatorScroll {
   findCurrentMessageIndex(messages) {
     if (!messages.length) return -1;
 
-    const viewportCenter = window.innerHeight / 2;
-    let closestIndex = 0;
-    let closestDistance = Number.POSITIVE_INFINITY;
+    try {
+      const viewportCenter = window.innerHeight / 2;
+      let closestIndex = 0;
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-    messages.forEach((message, index) => {
-      const rect = message.element.getBoundingClientRect();
+      messages.forEach((message, index) => {
+        const rect = message.element.getBoundingClientRect();
 
-      if (rect.bottom < 0 || rect.top > window.innerHeight) {
-        return;
+        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+          return;
+        }
+
+        const messageCenter = rect.top + rect.height / 2;
+        const distance = Math.abs(messageCenter - viewportCenter);
+
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestIndex = index;
+        }
+      });
+
+      if (closestDistance !== Number.POSITIVE_INFINITY) {
+        return closestIndex;
       }
 
-      const messageCenter = rect.top + rect.height / 2;
-      const distance = Math.abs(messageCenter - viewportCenter);
+      for (let i = messages.length - 1; i >= 0; i -= 1) {
+        const rect = messages[i].element.getBoundingClientRect();
 
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
+        if (rect.top <= viewportCenter) {
+          return i;
+        }
       }
-    });
-
-    if (closestDistance !== Number.POSITIVE_INFINITY) {
-      return closestIndex;
-    }
-
-    for (let i = messages.length - 1; i >= 0; i -= 1) {
-      const rect = messages[i].element.getBoundingClientRect();
-
-      if (rect.top <= viewportCenter) {
-        return i;
-      }
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error finding current message index', error);
     }
 
     return 0;
@@ -68,17 +80,22 @@ class GeminiNavigatorScroll {
   navigate(messages, direction) {
     if (!messages.length) return null;
 
-    const currentIndex = this.findCurrentMessageIndex(messages);
-    const targetIndex = Math.max(
-      0,
-      Math.min(currentIndex + direction, messages.length - 1)
-    );
-    const target = messages[targetIndex];
+    try {
+      const currentIndex = this.findCurrentMessageIndex(messages);
+      const targetIndex = Math.max(
+        0,
+        Math.min(currentIndex + direction, messages.length - 1)
+      );
+      const target = messages[targetIndex];
 
-    if (target) {
-      this.scrollToElement(target.element);
+      if (target) {
+        this.scrollToElement(target.element);
+      }
+
+      return targetIndex;
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error navigating', error);
+      return null;
     }
-
-    return targetIndex;
   }
 }
