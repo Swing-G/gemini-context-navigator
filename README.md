@@ -19,7 +19,7 @@
 
 <div align="center">
   <!-- 📷 截图占位符 1：放一张带有复杂长对话背景，同时展开侧边栏目录的全屏截图 -->
-  <img width="600" alt="show1" src="https://github.com/user-attachments/assets/3f7dcafb-c8b1-4ded-a9e8-3227da1acadf" />
+  <img width="600" alt="show1" src="https://github.com/user-attachments/assets/ff68afc9-11fb-4ced-990b-e7402e244a63" />
   <p><i>自动提取对话节点，生成平滑跳转的智能侧栏</i></p>
 </div>
 
