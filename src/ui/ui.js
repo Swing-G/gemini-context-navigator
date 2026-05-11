@@ -7,6 +7,8 @@ class GeminiNavigatorUI {
     this.tocList = null;
     this.pinnedList = null;
     this.pinnedItems = null;
+    this.toggleBtn = null;
+    this.messageCountBadge = null;
     this.isSidebarOpen = false;
     this.activeIndex = -1;
     this.pinnedMessages = new Set();
@@ -83,8 +85,14 @@ class GeminiNavigatorUI {
   createToggleButton() {
     const toggleBtn = document.createElement('div');
     toggleBtn.id = 'gn-toggle-btn';
-    toggleBtn.innerHTML = '☰';
+    toggleBtn.innerHTML = `
+      <span class="gn-toggle-icon">☰</span>
+      <span class="gn-message-count" style="display:none;">0</span>
+    `;
     toggleBtn.title = 'Toggle Context Navigator';
+    this.toggleBtn = toggleBtn;
+    this.messageCountBadge = toggleBtn.querySelector('.gn-message-count');
+    const toggleIcon = toggleBtn.querySelector('.gn-toggle-icon');
 
     let isDragging = false;
     let hasMoved = false;
@@ -99,7 +107,7 @@ class GeminiNavigatorUI {
       this.isSidebarOpen = true;
       this.sidebar.classList.add('visible');
       this.scrollActiveItemIntoView();
-      toggleBtn.innerHTML = '×';
+      toggleIcon.textContent = '×';
       toggleBtn.style.opacity = '1';
 
       const btnRect = toggleBtn.getBoundingClientRect();
@@ -126,7 +134,7 @@ class GeminiNavigatorUI {
       hoverTimeout = setTimeout(() => {
         this.isSidebarOpen = false;
         this.sidebar.classList.remove('visible');
-        toggleBtn.innerHTML = '☰';
+        toggleIcon.textContent = '☰';
         toggleBtn.style.opacity = '0.3';
       }, 300);
     };
@@ -233,8 +241,28 @@ class GeminiNavigatorUI {
     document.getElementById('gn-btn-bottom').onclick = () => this.scroll.scrollAll(false);
   }
 
+  updateMessageCount(count) {
+    if (!this.messageCountBadge) return;
+
+    try {
+      if (count <= 0) {
+        this.messageCountBadge.style.display = 'none';
+        this.messageCountBadge.textContent = '0';
+        this.toggleBtn.title = 'Toggle Context Navigator';
+        return;
+      }
+
+      this.messageCountBadge.style.display = 'inline-flex';
+      this.messageCountBadge.textContent = count > 99 ? '99+' : String(count);
+      this.toggleBtn.title = `Toggle Context Navigator (${count} messages)`;
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error updating message count badge', error);
+    }
+  }
+
   renderMessages(messages) {
     try {
+      this.updateMessageCount(messages.length);
       this.tocList.innerHTML = '';
       this.activeIndex = -1;
 

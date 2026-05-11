@@ -208,6 +208,33 @@ body[data-theme="dark"] {
   border-right: none;
   opacity: 1;
   font-size: 20px;
+  overflow: visible;
+}
+
+.gn-toggle-icon {
+  line-height: 1;
+}
+
+.gn-message-count {
+  position: absolute;
+  top: -8px;
+  left: -10px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--gn-accent-color);
+  color: white;
+  border: 2px solid var(--gn-bg-solid);
+  box-shadow: 0 2px 6px var(--gn-accent-shadow);
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+  user-select: none;
 }
 
 #gn-toggle-btn.dock-left {
@@ -217,6 +244,11 @@ body[data-theme="dark"] {
   border: 1px solid var(--gn-border-color);
   border-left: none;
   box-shadow: var(--gn-shadow-btn);
+}
+
+#gn-toggle-btn.dock-left .gn-message-count {
+  left: auto;
+  right: -10px;
 }
 
 #gn-toggle-btn:hover {
