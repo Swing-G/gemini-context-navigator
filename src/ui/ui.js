@@ -152,6 +152,8 @@ class GeminiNavigatorUI {
       startTop = toggleBtn.offsetTop;
       startLeft = toggleBtn.offsetLeft;
       toggleBtn.style.cursor = 'grabbing';
+      toggleBtn.style.transition = 'none';
+      toggleBtn.style.willChange = 'top, left';
       e.preventDefault();
     });
 
@@ -160,15 +162,18 @@ class GeminiNavigatorUI {
 
       const dy = e.clientY - startY;
       const dx = e.clientX - startX;
+      const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (!hasMoved && Math.sqrt(dx * dx + dy * dy) < 5) return;
-      hasMoved = true;
+      if (distance >= 3) {
+        hasMoved = true;
+      }
 
       const newTop = Math.max(10, Math.min(window.innerHeight - 40, startTop + dy));
       const newLeft = Math.max(10, Math.min(window.innerWidth - 40, startLeft + dx));
 
       toggleBtn.style.top = `${newTop}px`;
       toggleBtn.style.left = `${newLeft}px`;
+      toggleBtn.style.transform = 'translate3d(0, 0, 0)';
 
       if (this.isSidebarOpen) showSidebar();
     });
@@ -178,12 +183,16 @@ class GeminiNavigatorUI {
 
       isDragging = false;
       toggleBtn.style.cursor = 'grab';
+      toggleBtn.style.willChange = 'auto';
 
-      if (!hasMoved) return;
+      if (!hasMoved) {
+        toggleBtn.style.transition = 'opacity 0.3s ease, background 0.2s, width 0.2s';
+        return;
+      }
 
       const btnRect = toggleBtn.getBoundingClientRect();
       const centerX = btnRect.left + btnRect.width / 2;
-      toggleBtn.style.transition = 'all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      toggleBtn.style.transition = 'left 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease, background 0.2s';
 
       if (centerX < window.innerWidth / 2) {
         toggleBtn.style.left = '0px';
