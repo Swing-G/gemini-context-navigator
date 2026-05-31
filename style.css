@@ -121,6 +121,48 @@ body[data-theme="dark"] {
 }
 
 /* ============================================
+   Export Bar
+   ============================================ */
+#gn-export-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--gn-divider-color);
+}
+
+.gn-export-label {
+  font-size: 0.8em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.5;
+  margin-right: auto;
+}
+
+.gn-export-btn {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--gn-border-color);
+  background: var(--gn-hover-color);
+  color: var(--gn-text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+}
+
+.gn-export-btn:hover {
+  background: var(--gn-hover-btn);
+  color: var(--gn-accent-color);
+  border-color: var(--gn-accent-color);
+}
+
+.gn-export-btn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================
    TOC List
    ============================================ */
 #gn-toc-list {

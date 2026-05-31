@@ -1,8 +1,9 @@
 class GeminiNavigatorUI {
-  constructor({ scroll, onNavigate, onInitialScan }) {
+  constructor({ scroll, onNavigate, onInitialScan, onExport }) {
     this.scroll = scroll;
     this.onNavigate = onNavigate;
     this.onInitialScan = onInitialScan;
+    this.onExport = onExport;
     this.sidebar = null;
     this.tocList = null;
     this.pinnedList = null;
@@ -49,6 +50,11 @@ class GeminiNavigatorUI {
     this.sidebar = document.createElement('div');
     this.sidebar.id = 'gemini-nav-sidebar';
     this.sidebar.innerHTML = `
+      <div id="gn-export-bar">
+        <span class="gn-export-label">Export</span>
+        <button id="gn-export-md" class="gn-export-btn" title="Export as Markdown">📥 .md</button>
+        <button id="gn-export-json" class="gn-export-btn" title="Export as JSON">📥 .json</button>
+      </div>
       <div id="gn-toc-list"></div>
       <div id="gn-pinned-list" class="gn-pinned-section" style="display:none;">
         <div class="gn-section-title">Pinned</div>
@@ -60,6 +66,20 @@ class GeminiNavigatorUI {
     this.tocList = this.sidebar.querySelector('#gn-toc-list');
     this.pinnedList = this.sidebar.querySelector('#gn-pinned-list');
     this.pinnedItems = this.sidebar.querySelector('#gn-pinned-items');
+
+    const exportBar = this.sidebar.querySelector('#gn-export-bar');
+    const exportMdBtn = exportBar.querySelector('#gn-export-md');
+    const exportJsonBtn = exportBar.querySelector('#gn-export-json');
+
+    exportMdBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.onExport) this.onExport('md');
+    });
+
+    exportJsonBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (this.onExport) this.onExport('json');
+    });
 
     this.tocList.addEventListener('mouseenter', () => {
       this.isUserBrowsingTOC = true;

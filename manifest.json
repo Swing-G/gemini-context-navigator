@@ -27,6 +27,7 @@
         "src/utils/utils.js",
         "src/services/storage.js",
         "src/features/domScanner.js",
+        "src/features/exporter.js",
         "src/features/scroll.js",
         "src/ui/ui.js",
         "src/content.js"

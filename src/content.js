@@ -4,12 +4,14 @@ class GeminiNavigator {
     this.storage = new GeminiNavigatorStorage(this.config.defaultSettings);
     this.scanner = new GeminiNavigatorScanner(this.config);
     this.scroll = new GeminiNavigatorScroll();
+    this.exporter = new GeminiNavigatorExporter();
     this.messages = [];
     this.settings = { ...this.config.defaultSettings };
     this.ui = new GeminiNavigatorUI({
       scroll: this.scroll,
       onNavigate: (direction) => this.navigate(direction),
-      onInitialScan: () => this.scanMessages()
+      onInitialScan: () => this.scanMessages(),
+      onExport: (format) => this.exportConversation(format)
     });
 
     this.init();
@@ -190,6 +192,29 @@ class GeminiNavigator {
       this.syncActiveMessage();
     } catch (error) {
       console.error('Gemini Context Navigator: Error scanning messages', error);
+    }
+  }
+
+  exportConversation(format) {
+    try {
+      const conversation = this.scanner.scanFullConversation(this.settings);
+      if (!conversation.length) {
+        console.warn('Gemini Context Navigator: No conversation data to export');
+        return;
+      }
+
+      const exportedAt = new Date();
+      const filename = this.exporter.getFilename(format);
+
+      if (format === 'md') {
+        const content = this.exporter.exportMarkdown(conversation, exportedAt);
+        this.exporter.download(content, filename, 'text/markdown');
+      } else if (format === 'json') {
+        const content = this.exporter.exportJSON(conversation, exportedAt);
+        this.exporter.download(content, filename, 'application/json');
+      }
+    } catch (error) {
+      console.error('Gemini Context Navigator: Error exporting conversation', error);
     }
   }
 

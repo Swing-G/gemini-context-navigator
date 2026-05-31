@@ -71,6 +71,67 @@ class GeminiNavigatorScanner {
     }
   }
 
+  findAllAIMessageElements() {
+    try {
+      let elements = document.querySelectorAll(this.config.selectors.aiMessage);
+
+      if (elements.length === 0) {
+        const allDivs = document.querySelectorAll('div');
+        const aiDivs = Array.from(allDivs).filter(
+          (div) => div.className.includes && div.className.includes('model-response')
+        );
+
+        if (aiDivs.length > 0) {
+          elements = aiDivs;
+        }
+      }
+
+      return elements;
+    } catch (error) {
+      console.warn('Gemini Context Navigator: Error finding AI messages', error);
+      return [];
+    }
+  }
+
+  scanFullConversation(settings) {
+    try {
+      const userElements = this.findUserMessageElements();
+      const aiElements = this.findAllAIMessageElements();
+
+      const allTurns = [];
+
+      Array.from(userElements).forEach((el) => {
+        allTurns.push({ element: el, role: 'user' });
+      });
+
+      Array.from(aiElements).forEach((el) => {
+        allTurns.push({ element: el, role: 'ai' });
+      });
+
+      allTurns.sort((a, b) => {
+        const pos = a.element.compareDocumentPosition(b.element);
+        if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+        if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+        return 0;
+      });
+
+      return allTurns.map((turn, index) => {
+        let text = turn.element.innerText.trim();
+        if (turn.role === 'user') {
+          text = GeminiNavigatorUtils.stripTitlePrefix(text, this.config.titlePrefixes);
+        }
+        return {
+          role: turn.role,
+          content: text,
+          index
+        };
+      });
+    } catch (error) {
+      console.error('Gemini Context Navigator: Error scanning full conversation', error);
+      return [];
+    }
+  }
+
   buildMessages(elements, settings) {
     try {
       let candidates = elements;
